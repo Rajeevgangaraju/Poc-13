@@ -14,23 +14,27 @@ pipeline {
             }
         }
 
-        stage('Clean Terraform Cache') {
+        // ✅ FORCE CLEAN (Important to fix your errors)
+        stage('Force Clean Terraform') {
             steps {
-                dir('terraform') {
-                    sh 'rm -rf .terraform'
-                    sh 'rm -rf .terraform.lock.hcl'
-                }
+                sh '''
+                rm -rf terraform/.terraform
+                rm -rf terraform/.terraform.lock.hcl
+                rm -rf ~/.terraform.d
+                '''
             }
         }
 
+        // ✅ Terraform Init (force correct module + provider)
         stage('Terraform Init') {
             steps {
                 dir('terraform') {
-                    sh 'terraform init -upgrade'
+                    sh 'terraform init -upgrade -reconfigure'
                 }
             }
         }
 
+        // ✅ Terraform Apply (creates VPC + EKS)
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
@@ -39,12 +43,14 @@ pipeline {
             }
         }
 
+        // ✅ Configure kubectl to connect to EKS
         stage('Configure Kubeconfig') {
             steps {
                 sh 'aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME'
             }
         }
 
+        // ✅ Deploy application to EKS
         stage('Deploy to EKS') {
             steps {
                 sh 'kubectl apply -f deployment.yaml'
@@ -52,9 +58,11 @@ pipeline {
             }
         }
 
+        // ✅ Verification
         stage('Verification') {
             steps {
                 sh 'kubectl get nodes'
+                sh 'kubectl get pods'
                 sh 'kubectl get svc'
             }
         }
