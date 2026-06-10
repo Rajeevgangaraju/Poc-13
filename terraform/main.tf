@@ -19,7 +19,7 @@ module "eks" {
   version = "18.31.2"
 
   cluster_name    = "poc-eks-cluster"
-  cluster_version = "1.27"
+  cluster_version = "1.29"
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
