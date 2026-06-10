@@ -14,10 +14,19 @@ pipeline {
             }
         }
 
+        stage('Clean Terraform Cache') {
+            steps {
+                dir('terraform') {
+                    sh 'rm -rf .terraform'
+                    sh 'rm -rf .terraform.lock.hcl'
+                }
+            }
+        }
+
         stage('Terraform Init') {
             steps {
                 dir('terraform') {
-                    sh 'terraform init'
+                    sh 'terraform init -upgrade'
                 }
             }
         }
