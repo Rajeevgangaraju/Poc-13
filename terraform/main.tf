@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.0.0"
+  version = "~> 5.0"
 
   name = "eks-vpc"
   cidr = "10.0.0.0/16"
@@ -16,22 +16,25 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "19.21.0"
+  version = "~> 19.0"
 
   cluster_name    = "poc-eks-cluster"
-  cluster_version = "1.29"
+  cluster_version = "1.28"   # ✅ safer than 1.29 (avoids errors)
 
-  subnet_ids = module.vpc.private_subnets
   vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
 
   cluster_endpoint_public_access = true
 
   eks_managed_node_groups = {
     default = {
-      desired_size   = 2
-      max_size       = 2
-      min_size       = 1
+      name = "default-node-group"
+
       instance_types = ["t3.medium"]
+
+      desired_size = 2
+      max_size     = 2
+      min_size     = 1
     }
   }
 }
