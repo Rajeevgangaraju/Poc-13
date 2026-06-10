@@ -43,6 +43,14 @@ pipeline {
             }
         }
 
+        stage('Terraform Destroy') {
+            steps {
+                dir('terraform') {
+                    sh 'terraform destroy -auto-approve'
+                }
+            }
+        }
+
         // ✅ Configure kubectl to connect to EKS
         stage('Configure Kubeconfig') {
             steps {
