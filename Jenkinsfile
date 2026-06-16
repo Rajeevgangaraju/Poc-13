@@ -2,39 +2,26 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION = 'ap-south-1'
-        CLUSTER_NAME = 'poc-eks-cluster'
+        AWS_REGION = "ap-south-1"
+        CLUSTER_NAME = "poc-eks-cluster"
     }
 
     stages {
 
-        stage('Initialize') {
+        stage('Clone Repo') {
             steps {
-                echo "Starting CI/CD Pipeline..."
+                git 'https://github.com/rajeevgangaraju/Poc-13.git'
             }
         }
 
-        // ✅ FORCE CLEAN (Important to fix your errors)
-        stage('Force Clean Terraform') {
-            steps {
-                sh '''
-                rm -rf terraform/.terraform
-                rm -rf terraform/.terraform.lock.hcl
-                rm -rf ~/.terraform.d
-                '''
-            }
-        }
-
-        // ✅ Terraform Init (force correct module + provider)
         stage('Terraform Init') {
             steps {
                 dir('terraform') {
-                    sh 'terraform init -upgrade -reconfigure'
+                    sh 'terraform init'
                 }
             }
         }
 
-        // ✅ Terraform Apply (creates VPC + EKS)
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
@@ -43,23 +30,26 @@ pipeline {
             }
         }
 
-        // ✅ Configure kubectl to connect to EKS
-        stage('Configure Kubeconfig') {
+        stage('Update Kubeconfig') {
             steps {
-                sh 'aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME'
+                sh """
+                aws eks update-kubeconfig \
+                --region $AWS_REGION \
+                --name $CLUSTER_NAME
+                """
             }
         }
 
-        // ✅ Deploy application to EKS
-        stage('Deploy to EKS') {
+        stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f deployment.yaml'
-                sh 'kubectl apply -f service.yaml'
+                dir('k8s') {
+                    sh 'kubectl apply -f deployment.yaml'
+                    sh 'kubectl apply -f service.yaml'
+                }
             }
         }
 
-        // ✅ Verification
-        stage('Verification') {
+        stage('Verify') {
             steps {
                 sh 'kubectl get nodes'
                 sh 'kubectl get pods'
