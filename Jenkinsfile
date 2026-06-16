@@ -11,7 +11,7 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 dir('terraform') {
-                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS creds']]) {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS Creds']]) {
                         sh 'terraform init'
                     }
                 }
@@ -21,7 +21,7 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
-                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS creds']]) {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS Creds']]) {
                         sh 'terraform apply -auto-approve'
                     }
                 }
@@ -30,7 +30,7 @@ pipeline {
 
         stage('Update Kubeconfig') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS creds']]) {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS Creds']]) {
                     sh """
                     aws eks update-kubeconfig \
                     --region $AWS_REGION \
