@@ -1,4 +1,5 @@
-apiVersion: v1apiVersion:kind: Service
+apiVersion: v1
+kind: Service
 metadata:
   name: node-service
 spec:
