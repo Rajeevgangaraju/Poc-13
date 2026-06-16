@@ -7,7 +7,7 @@ variable "cluster_name" {
 }
 
 variable "cluster_version" {
-  default = "1.28"
+  default = "1.27"
 }
 
 variable "instance_type" {
