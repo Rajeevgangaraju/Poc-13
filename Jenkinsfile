@@ -8,11 +8,11 @@ pipeline {
 
     stages {
 
-        stage('Clone Repo') {
-            steps {
-                git 'https://github.com/rajeevgangaraju/Poc-13.git'
-            }
-        }
+        // stage('Clone Repo') {
+        //     steps {
+        //         git 'https://github.com/rajeevgangaraju/Poc-13.git'
+        //     }
+        // }
 
         stage('Terraform Init') {
             steps {
