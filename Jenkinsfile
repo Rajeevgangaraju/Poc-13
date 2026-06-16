@@ -42,16 +42,20 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f deployment.yaml'
-                sh 'kubectl apply -f service.yaml'
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS Creds']]) {
+                    sh 'kubectl apply -f deployment.yaml'
+                    sh 'kubectl apply -f service.yaml'
+                }
             }
         }
 
         stage('Verify') {
             steps {
-                sh 'kubectl get nodes'
-                sh 'kubectl get pods'
-                sh 'kubectl get svc'
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS Creds']]) {
+                    sh 'kubectl get nodes'
+                    sh 'kubectl get pods'
+                    sh 'kubectl get svc'
+                }
             }
         }
     }
